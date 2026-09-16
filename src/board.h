@@ -9,5 +9,7 @@ typedef struct {
 Board *board_create(int tamanho);
 void board_destroy(Board *board);
 void board_initialize(Board *board);
+int board_move(Board *board, int linha, int coluna);
+void board_shuffle(Board *board, int movimentos);
 
 #endif
