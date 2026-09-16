@@ -133,3 +133,20 @@ void board_shuffle(Board *board, int movimentos)
         } while (!board_move_random(board, direcao));
     }
 }
+
+int board_is_solved(Board *board)
+{
+    int quantidade_celulas = board->tamanho * board->tamanho;
+
+    for (int i = 0; i < quantidade_celulas; i++) {
+        int valor_esperado = i + 1;
+
+        if (i == quantidade_celulas - 1)
+            valor_esperado = 0;
+
+        if (board->tabuleiro[i] != valor_esperado)
+            return 0;
+    }
+
+    return 1;
+}
