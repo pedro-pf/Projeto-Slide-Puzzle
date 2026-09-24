@@ -27,17 +27,8 @@ int main(void) {
             ToggleFullscreen();
         }
 
-        // =====================================================
-        // TAMANHO ATUAL DA ÁREA DE RENDERIZAÇÃO
-        // =====================================================
-
         int largura_tela = GetRenderWidth();
         int altura_tela = GetRenderHeight();
-
-
-        // =====================================================
-        // MESA
-        // =====================================================
 
         Rectangle Sf = {
             0.0f,
