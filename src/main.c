@@ -1,6 +1,6 @@
 #include "raylib.h"
-#include "src/board.h"
-#include "src/game.h"
+#include "board.h"
+#include "game.h"
 #include "draw.h"
 
 int main(void) {
