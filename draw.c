@@ -10,6 +10,17 @@ int main(void) {
 
     Texture2D mesa = LoadTexture("Assets/mesa.png");
 
+        Texture2D maca1 = LoadTexture("Assets/maca1.png");
+        Texture2D maca2 = LoadTexture("Assets/maca2.png");
+        Texture2D maca3 = LoadTexture("Assets/maca3.png");
+        Texture2D maca4 = LoadTexture("Assets/maca4.png");
+        Texture2D maca5 = LoadTexture("Assets/maca5.png");
+        Texture2D maca6 = LoadTexture("Assets/maca6.png");
+        Texture2D maca7 = LoadTexture("Assets/maca7.png");
+        Texture2D maca8 = LoadTexture("Assets/maca8.png");
+        Texture2D maca9 = LoadTexture("Assets/maca9.png");
+    Texture2D img[3][3] = { maca1, maca2, maca3, maca4, maca5, maca6, maca7, maca8, maca9,
+    };
     Color cor = BLUE;
     bool c = true;
 
@@ -62,7 +73,12 @@ int main(void) {
 
         int num = 0;
 
-
+        for ( int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+            img[i][j].width = lrr;
+            img[i][j].height = trr;
+            }
+        }
         BeginDrawing();
 
         ClearBackground(cor);
@@ -105,11 +121,10 @@ int main(void) {
                         PURPLE
                     );
 
-                    DrawText(
-                        TextFormat("%d", tab->tabuleiro[num]),
-                        xr + ctp,
-                        yr + clp,
-                        2,
+                    DrawTexture(
+                        img[j][i],
+                        xr + 1,
+                        yr + 1,
                         WHITE
                     );
                 }
