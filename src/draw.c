@@ -29,10 +29,6 @@ int main(void)
 
     Color cor = BLUE;
 
-    /*
-        O Game cria o Board internamente.
-        Portanto, NÃO criamos outro Board aqui.
-    */
     Game *game = game_create(3);
 
     if (game == NULL)
@@ -55,9 +51,6 @@ int main(void)
 
     game_start(game);
 
-    /*
-        Pegamos exatamente o Board que pertence ao Game.
-    */
     Board *tab = game_get_board(game);
 
     // Tamanho inicial do tabuleiro
@@ -66,13 +59,6 @@ int main(void)
 
     while (!WindowShouldClose())
     {
-        /*
-            Movimentação
-            0 = cima
-            1 = baixo
-            2 = esquerda
-            3 = direita
-        */
         if (IsKeyPressed(KEY_UP))
             game_move_direction(game, 0);
 
@@ -92,9 +78,6 @@ int main(void)
         int largura_tela = GetRenderWidth();
         int altura_tela = GetRenderHeight();
 
-        /*
-            Mesa
-        */
         Rectangle Sf = {
             0.0f,
             0.0f,
@@ -109,16 +92,9 @@ int main(void)
             (float)GetRenderHeight() + 300
         };
 
-        /*
-            Mantém o tabuleiro no centro da tela
-        */
         int x = (largura_tela - tr) / 2;
         int y = (altura_tela - lr) / 2;
 
-        /*
-            O tamanho é 3 porque o Board é 3x3.
-            NÃO usamos sqrt aqui.
-        */
         int tamanho_lado = tab->tamanho;
 
         int trr = tr / tamanho_lado;
@@ -130,9 +106,6 @@ int main(void)
 
         ClearBackground(cor);
 
-        /*
-            Mesa ocupa toda a tela
-        */
         DrawTexturePro(
             mesa,
             Sf,
@@ -142,9 +115,6 @@ int main(void)
             WHITE
         );
 
-        /*
-            Fundo do tabuleiro
-        */
         DrawRectangle(
             x,
             y,
@@ -153,43 +123,19 @@ int main(void)
             YELLOW
         );
 
-        /*
-            Peças
-        */
         for (int j = 0; j < tamanho_lado; j++)
         {
             int xr = x;
 
             for (int i = 0; i < tamanho_lado; i++)
             {
-                /*
-                    Pegamos o VALOR que está nessa posição.
-
-                    Exemplo:
-                    tabuleiro =
-
-                    1 2 3
-                    4 5 6
-                    7 0 8
-
-                    Na última posição teremos valor 8,
-                    então desenhamos maca8.
-                */
+   
                 int valor = tab->tabuleiro[num];
 
-                /*
-                    0 é o espaço vazio.
-                    Portanto, não desenhamos nenhuma maçã.
-                */
+             
                 if (valor != 0)
                 {
-                    /*
-                        Os valores vão de 1 até 9,
-                        enquanto os índices da matriz img vão
-                        de 0 até 8.
-
-                        Por isso fazemos valor - 1.
-                    */
+                  
                     int indice = valor - 1;
 
                     int img_linha = indice / 3;
@@ -211,9 +157,7 @@ int main(void)
                         (float)(lrr - 2)
                     };
 
-                    /*
-                        Fundo roxo da peça
-                    */
+                 
                     DrawRectangle(
                         xr + 1,
                         y + j * lrr + 1,
@@ -222,9 +166,7 @@ int main(void)
                         PURPLE
                     );
 
-                    /*
-                        Desenha a maçã dentro da casa.
-                    */
+                   
                     DrawTexturePro(
                         maca,
                         source,
@@ -243,11 +185,6 @@ int main(void)
         EndDrawing();
     }
 
-    /*
-        O Board pertence ao Game.
-        Portanto, NÃO fazemos board_destroy(tab).
-        game_destroy() já destrói o Board.
-    */
     game_destroy(game);
 
     UnloadTexture(mesa);
