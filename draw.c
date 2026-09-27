@@ -1,7 +1,8 @@
 #include "raylib.h"
 #include "draw.h"
 #include <stdio.h>
-#include "board.c"
+#include "src/board.h"
+#include "src/game.h"
 #include <math.h>
 
 int main(void) {
@@ -15,12 +16,20 @@ int main(void) {
 
     Board *tab = board_create(9);
     board_initialize(tab);
+    Game *game = game_create(3);
+    game_start(game);
 
     // Tamanho inicial do tabuleiro
     int tr = 350;
     int lr = 350;
 
     while (!WindowShouldClose()) {
+        
+        // Lê as setas do teclado e move a peça se o jogador apertar
+        if (IsKeyPressed(KEY_UP))    game_move_direction(game, 0); // Ajuste o número da direção conforme sua lógica
+        if (IsKeyPressed(KEY_DOWN))  game_move_direction(game, 1);
+        if (IsKeyPressed(KEY_LEFT))  game_move_direction(game, 2);
+        if (IsKeyPressed(KEY_RIGHT)) game_move_direction(game, 3);
 
         // Tela cheia
         if (IsKeyPressed(KEY_F11)) {
