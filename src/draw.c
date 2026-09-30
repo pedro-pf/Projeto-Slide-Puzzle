@@ -1,64 +1,133 @@
-#include "raylib.h"
+#ifndef DRAW_H
+#define DRAW_H
+
 #include <stdio.h>
-#include "game.h"
-#include "game.c"
+#include <stdlib.h>
+#include "raylib.h"
 #include "board.h"
+#include "game.c"
+#include "game.h"
 #include "board.c"
+
+// Desenha o puzzle a partir de uma imagem inteira.
+// O tamanho é obtido automaticamente do tabuleiro.
+void draw_puzzle(
+    Texture2D imagem,
+    const Board *tabuleiro,
+    Rectangle area
+);
+
+#endif
+
+void draw_puzzle(
+    Texture2D imagem,
+    const Board *tabuleiro,
+    Rectangle area
+) {
+    if (tabuleiro == NULL ||
+        tabuleiro->tabuleiro == NULL ||
+        tabuleiro->tamanho < 2 ||
+        imagem.id == 0) {
+        return;
+    }
+
+    int lado = tabuleiro->tamanho;
+
+    // Dimensões de cada recorte na imagem original.
+    float largura_origem = (float)imagem.width / lado;
+    float altura_origem = (float)imagem.height / lado;
+
+    // Dimensões de cada peça na tela.
+    float largura_destino = area.width / lado;
+    float altura_destino = area.height / lado;
+
+    // Fundo que aparecerá no espaço vazio.
+    DrawRectangleRec(area, DARKGRAY);
+
+    for (int linha = 0; linha < lado; linha++) {
+        for (int coluna = 0; coluna < lado; coluna++) {
+
+            int indice = linha * lado + coluna;
+            int peca = tabuleiro->tabuleiro[indice];
+
+            // O zero representa o espaço vazio.
+            if (peca == 0) {
+                continue;
+            }
+
+            // Descobre a posição original da peça.
+            int origem = peca - 1;
+
+            int linha_origem = origem / lado;
+            int coluna_origem = origem % lado;
+
+            // Região da imagem que pertence à peça.
+            Rectangle recorte = {
+                coluna_origem * largura_origem,
+                linha_origem * altura_origem,
+                largura_origem,
+                altura_origem
+            };
+
+            // Posição atual da peça no tabuleiro.
+            Rectangle destino = {
+                area.x + coluna * largura_destino,
+                area.y + linha * altura_destino,
+                largura_destino,
+                altura_destino
+            };
+
+            DrawTexturePro(
+                imagem,
+                recorte,
+                destino,
+                (Vector2){0, 0},
+                0.0f,
+                WHITE
+            );
+
+            // Borda para distinguir as peças.
+            DrawRectangleLinesEx(destino, 1.5f, BLACK);
+        }
+    }
+
+    DrawRectangleLinesEx(area, 2.0f, BLACK);
+}
 
 int main(void)
 {
-    InitWindow(900, 500, "Jogo");
+    InitWindow(900, 500, "Slide Puzzle");
+    SetTargetFPS(60);
 
     Texture2D mesa = LoadTexture("Assets/mesa.png");
+    Texture2D imagem = LoadTexture("Assets/maca.png");
 
-    Texture2D maca1 = LoadTexture("Assets/maca1.png");
-    Texture2D maca2 = LoadTexture("Assets/maca2.png");
-    Texture2D maca3 = LoadTexture("Assets/maca3.png");
-    Texture2D maca4 = LoadTexture("Assets/maca4.png");
-    Texture2D maca5 = LoadTexture("Assets/maca5.png");
-    Texture2D maca6 = LoadTexture("Assets/maca6.png");
-    Texture2D maca7 = LoadTexture("Assets/maca7.png");
-    Texture2D maca8 = LoadTexture("Assets/maca8.png");
-    Texture2D maca9 = LoadTexture("Assets/maca9.png");
+    Game *game = game_create(3); 
 
-    Texture2D img[3][3] = {
-        { maca1, maca2, maca3 },
-        { maca4, maca5, maca6 },
-        { maca7, maca8, maca9 }
-    };
-
-    Color cor = BLUE;
-
-    Game *game = game_create(3);
-
-    if (game == NULL)
-    {
-        UnloadTexture(mesa);
-
-        UnloadTexture(maca1);
-        UnloadTexture(maca2);
-        UnloadTexture(maca3);
-        UnloadTexture(maca4);
-        UnloadTexture(maca5);
-        UnloadTexture(maca6);
-        UnloadTexture(maca7);
-        UnloadTexture(maca8);
-        UnloadTexture(maca9);
-
+    if (imagem.id == 0) {
+        if (mesa.id != 0) UnloadTexture(mesa);
         CloseWindow();
         return 1;
     }
 
     game_start(game);
+    
 
+    // O argumento é o número de linhas e colunas.
     Board *tab = game_get_board(game);
 
-    // Tamanho inicial do tabuleiro
-    int tr = 350;
-    int lr = 350;
 
-    while (!WindowShouldClose())
-    {
+    if (tab == NULL) {
+        UnloadTexture(imagem);
+        if (mesa.id != 0) UnloadTexture(mesa);
+        CloseWindow();
+        return 1;
+    }
+
+    board_initialize(tab);
+    board_shuffle(tab,50);
+
+    while (!WindowShouldClose()) {
         if (IsKeyPressed(KEY_UP))
             game_move_direction(game, 0);
 
@@ -71,135 +140,58 @@ int main(void)
         if (IsKeyPressed(KEY_RIGHT))
             game_move_direction(game, 3);
 
-        // Tela cheia
-        if (IsKeyPressed(KEY_F11))
+        if (IsKeyPressed(KEY_F11)) {
             ToggleFullscreen();
+        }
 
-        int largura_tela = GetRenderWidth();
-        int altura_tela = GetRenderHeight();
+        float largura = (float)GetRenderWidth();
+        float altura = (float)GetRenderHeight();
 
-        Rectangle Sf = {
-            0.0f,
-            0.0f,
-            (float)mesa.width,
-            (float)mesa.height
+        Rectangle area_tabuleiro = {
+            (largura - 350.0f) / 2.0f,
+            (altura - 350.0f) / 2.0f,
+            350.0f,
+            350.0f
         };
-
-        Rectangle Df = {
-            -230.0f,
-            -135.0f,
-            (float)GetRenderWidth() + 450,
-            (float)GetRenderHeight() + 300
-        };
-
-        int x = (largura_tela - tr) / 2;
-        int y = (altura_tela - lr) / 2;
-
-        int tamanho_lado = tab->tamanho;
-
-        int trr = tr / tamanho_lado;
-        int lrr = lr / tamanho_lado;
-
-        int num = 0;
 
         BeginDrawing();
+        ClearBackground(BLUE);
 
-        ClearBackground(cor);
+        if (mesa.id != 0) {
+            Rectangle origem_mesa = {
+                0, 0,
+                (float)mesa.width,
+                (float)mesa.height
+            };
 
-        DrawTexturePro(
-            mesa,
-            Sf,
-            Df,
-            (Vector2){0.0f, 0.0f},
-            0.0f,
-            WHITE
-        );
+            Rectangle destino_mesa = {
+                -230, -135,
+                largura + 450,
+                altura + 300
+            };
 
-        DrawRectangle(
-            x,
-            y,
-            tr,
-            lr,
-            YELLOW
-        );
-
-        for (int j = 0; j < tamanho_lado; j++)
-        {
-            int xr = x;
-
-            for (int i = 0; i < tamanho_lado; i++)
-            {
-   
-                int valor = tab->tabuleiro[num];
-
-             
-                if (valor != 0)
-                {
-                  
-                    int indice = valor - 1;
-
-                    int img_linha = indice / 3;
-                    int img_coluna = indice % 3;
-
-                    Texture2D maca = img[img_linha][img_coluna];
-
-                    Rectangle source = {
-                        0.0f,
-                        0.0f,
-                        (float)maca.width,
-                        (float)maca.height
-                    };
-
-                    Rectangle dest = {
-                        (float)(xr + 1),
-                        (float)(y + j * lrr + 1),
-                        (float)(trr - 2),
-                        (float)(lrr - 2)
-                    };
-
-                 
-                    DrawRectangle(
-                        xr + 1,
-                        y + j * lrr + 1,
-                        trr - 2,
-                        lrr - 2,
-                        PURPLE
-                    );
-
-                   
-                    DrawTexturePro(
-                        maca,
-                        source,
-                        dest,
-                        (Vector2){0.0f, 0.0f},
-                        0.0f,
-                        WHITE
-                    );
-                }
-
-                xr += trr;
-                num++;
-            }
+            DrawTexturePro(
+                mesa,
+                origem_mesa,
+                destino_mesa,
+                (Vector2){0, 0},
+                0,
+                WHITE
+            );
         }
+
+        draw_puzzle(imagem, tab, area_tabuleiro);
 
         EndDrawing();
     }
 
-    game_destroy(game);
+    board_destroy(tab);
+    UnloadTexture(imagem);
 
-    UnloadTexture(mesa);
-
-    UnloadTexture(maca1);
-    UnloadTexture(maca2);
-    UnloadTexture(maca3);
-    UnloadTexture(maca4);
-    UnloadTexture(maca5);
-    UnloadTexture(maca6);
-    UnloadTexture(maca7);
-    UnloadTexture(maca8);
-    UnloadTexture(maca9);
+    if (mesa.id != 0) {
+        UnloadTexture(mesa);
+    }
 
     CloseWindow();
-
     return 0;
 }
