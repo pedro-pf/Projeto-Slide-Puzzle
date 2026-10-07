@@ -12,12 +12,6 @@ void draw_puzzle(
     Texture2D imagem,
     const Board *tabuleiro,
     Rectangle area
-);
-
-void draw_puzzle(
-    Texture2D imagem,
-    const Board *tabuleiro,
-    Rectangle area
 ) {
     if (tabuleiro == NULL ||
         tabuleiro->tabuleiro == NULL ||
