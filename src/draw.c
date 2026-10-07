@@ -1,6 +1,3 @@
-#ifndef DRAW_H
-#define DRAW_H
-
 #include <stdio.h>
 #include <stdlib.h>
 #include "raylib.h"
@@ -16,8 +13,6 @@ void draw_puzzle(
     const Board *tabuleiro,
     Rectangle area
 );
-
-#endif
 
 void draw_puzzle(
     Texture2D imagem,
