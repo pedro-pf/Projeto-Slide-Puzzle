@@ -1,11 +1,14 @@
-#include "board.h"
-#include <stdlib.h>
+
 #include "game.h"
+#include <stdlib.h>
 
 #define EMBARALHAMENTO_PADRAO 100
 
 Game *game_create(int tamanho)
 {
+    if (tamanho < 2)
+        return NULL;
+
     Game *game = malloc(sizeof(Game));
 
     if (game == NULL)
@@ -101,21 +104,20 @@ int game_move_direction(Game *game, int direcao)
     int linha_peca = linha_vazio;
     int coluna_peca = coluna_vazio;
 
-    /* Mesma convenção usada no embaralhamento do board.c */
     switch (direcao) {
-        case 0: // cima
+        case 0:
             linha_peca--;
             break;
 
-        case 1: // baixo
+        case 1:
             linha_peca++;
             break;
 
-        case 2: // esquerda
+        case 2:
             coluna_peca--;
             break;
 
-        case 3: // direita
+        case 3:
             coluna_peca++;
             break;
 
@@ -163,19 +165,22 @@ int game_set_size(Game *game, int tamanho)
     if (game == NULL || tamanho < 2)
         return 0;
 
-    board_destroy(game->board);
+    Board *novo_board = board_create(tamanho);
 
-    game->board = board_create(tamanho);
-
-    if (game->board == NULL)
+    if (novo_board == NULL)
         return 0;
 
-    game->tamanho = tamanho;
-    board_initialize(game->board);
+    board_initialize(novo_board);
 
+    Board *board_anterior = game->board;
+
+    game->board = novo_board;
+    game->tamanho = tamanho;
     game->movimentos = 0;
     game->venceu = 0;
     game->iniciado = 0;
+
+    board_destroy(board_anterior);
 
     return 1;
 }
