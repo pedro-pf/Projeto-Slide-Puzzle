@@ -1,5 +1,4 @@
 #include "raylib.h"
-#include "board.h"
 #include "game.h"
 #include "draw.h"
 
