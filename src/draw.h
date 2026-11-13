@@ -3,9 +3,9 @@
 
 #include "raylib.h"
 #include "board.h"
-#include "game.c"
-#include "game.h"
-#include "board.c"
+
+
+void draw_background(Texture2D mesa, Color cor_fundo);
 
 void draw_puzzle(
     Texture2D imagem,

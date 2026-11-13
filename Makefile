@@ -1,9 +1,18 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -std=c99
-LIBS = -lraylib -lGL -lm -lpthread -ldl -lrt -lX11
 
-SRC = src/board.c src/game.c draw.c 
+CFLAGS = -Wall -Wextra -std=c99 -Isrc
+
+LIBS = -lraylib -lopengl32 -lgdi32 -lwinmm
+
+SRC = \
+	src/main.c \
+	src/board.c \
+	src/game.c \
+	src/draw.c \
+	src/input.c
+
 OBJ = $(SRC:.c=.o)
+
 EXEC = jogo
 
 all: $(EXEC)
@@ -15,4 +24,4 @@ $(EXEC): $(OBJ)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 clean:
-	rm -f src/*.o $(EXEC)
+	rm -f $(OBJ) $(EXEC)
