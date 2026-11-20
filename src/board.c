@@ -1,22 +1,35 @@
-#include <stdlib.h>
-#include <time.h>
 #include "board.h"
+#include <limits.h>
+#include <stdlib.h>
 
 Board *board_create(int tamanho)
 {
+    if (tamanho < 2)
+        return NULL;
+
+    size_t n = (size_t)tamanho;
+
+    if (n > (size_t)INT_MAX / n)
+        return NULL;
+
+    size_t quantidade_celulas = n * n;
+
+    if (quantidade_celulas > (size_t)-1 / sizeof(int))
+        return NULL;
+
     Board *board = malloc(sizeof(Board));
 
     if (board == NULL)
         return NULL;
 
-    board->tamanho = tamanho;
-
-    board->tabuleiro = malloc(tamanho * tamanho * sizeof(int));
+    board->tabuleiro = malloc(quantidade_celulas * sizeof(int));
 
     if (board->tabuleiro == NULL) {
         free(board);
         return NULL;
     }
+
+    board->tamanho = tamanho;
 
     return board;
 }
@@ -32,6 +45,9 @@ void board_destroy(Board *board)
 
 void board_initialize(Board *board)
 {
+    if (board == NULL || board->tabuleiro == NULL || board->tamanho < 2)
+        return;
+
     int quantidade_celulas = board->tamanho * board->tamanho;
 
     for (int i = 0; i < quantidade_celulas; i++) {
@@ -44,6 +60,9 @@ void board_initialize(Board *board)
 
 static int board_find_empty(Board *board)
 {
+    if (board == NULL || board->tabuleiro == NULL || board->tamanho < 2)
+        return -1;
+
     int quantidade_celulas = board->tamanho * board->tamanho;
 
     for (int i = 0; i < quantidade_celulas; i++) {
@@ -56,6 +75,9 @@ static int board_find_empty(Board *board)
 
 int board_move(Board *board, int linha, int coluna)
 {
+    if (board == NULL || board->tabuleiro == NULL || board->tamanho < 2)
+        return 0;
+
     int tamanho = board->tamanho;
 
     if (linha < 0 || linha >= tamanho ||
@@ -89,6 +111,9 @@ int board_move(Board *board, int linha, int coluna)
 
 static int board_move_random(Board *board, int direcao)
 {
+    if (board == NULL || board->tabuleiro == NULL || direcao < 0 || direcao > 3)
+        return 0;
+
     int indice_vazio = board_find_empty(board);
 
     if (indice_vazio == -1)
@@ -118,6 +143,9 @@ static int board_move_random(Board *board, int direcao)
         case 3:
             coluna_peca++;
             break;
+
+        default:
+            return 0;
     }
 
     return board_move(board, linha_peca, coluna_peca);
@@ -125,6 +153,13 @@ static int board_move_random(Board *board, int direcao)
 
 void board_shuffle(Board *board, int movimentos)
 {
+    if (board == NULL || board->tabuleiro == NULL ||
+        board->tamanho < 2 || movimentos <= 0)
+        return;
+
+    if (board_find_empty(board) == -1)
+        return;
+
     for (int i = 0; i < movimentos; i++) {
         int direcao;
 
@@ -136,6 +171,9 @@ void board_shuffle(Board *board, int movimentos)
 
 int board_is_solved(Board *board)
 {
+    if (board == NULL || board->tabuleiro == NULL || board->tamanho < 2)
+        return 0;
+
     int quantidade_celulas = board->tamanho * board->tamanho;
 
     for (int i = 0; i < quantidade_celulas; i++) {
